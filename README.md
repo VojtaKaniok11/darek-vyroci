@@ -32,7 +32,7 @@ Všechno, co budeš měnit, je v souboru **`data/vzpominky.ts`**:
 
 Postup se průběžně ukládá do prohlížeče (`localStorage`, klíč `nase-nebe-postup`), takže obnovení stránky, zamčení telefonu ani zavření záložky hru nevrátí na začátek. Ukládá se jen fáze, počet spojených hvězd a to, jestli je srdce hotové – nic se nikam neodesílá.
 
-Úplně dole pod závěrečným vzkazem je nenápadné tlačítko **„Spojit hvězdy znovu“**, kterým se dá hra přehrát od začátku (třeba když ji bude chtít někomu ukázat). Přeskočí úvodní otázku a začne rovnou úvodní kartou.
+Úplně dole pod závěrečným vzkazem je nenápadné tlačítko **„Spojit hvězdy znovu“**, kterým se dá hra přehrát úplně od začátku – včetně úvodní otázky (třeba když ji bude chtít někomu ukázat).
 
 Postup je uložený v konkrétním prohlížeči, takže na jiném telefonu začne hra od začátku.
 

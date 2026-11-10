@@ -107,7 +107,10 @@ export default function NaseNebe() {
     setSpojeno(0);
     setHotovo(false);
     setOtevrena(null);
-    setFaze("uvod");
+    setOdpoved("");
+    setChyba(false);
+    setTajemstviOdhaleno(false);
+    setFaze(otazka.zapnuto ? "zamek" : "uvod");
     window.scrollTo({ top: 0 });
   };
 
