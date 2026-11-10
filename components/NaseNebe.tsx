@@ -2,11 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import sky from "@/data/sky.json";
-import { vzpominky, otazka, vyhra, finale } from "@/data/vzpominky";
+import { vzpominky, otazka, vyhra, finale, tajnyVzkaz } from "@/data/vzpominky";
 
 type Faze = "zamek" | "uvod" | "hra" | "vyhra" | "galerie";
 
 const GOLD = "#C7A27C";
+const ULOZISTE = "nase-nebe-postup";
+const FAZE: Faze[] = ["zamek", "uvod", "hra", "vyhra", "galerie"];
 
 const bezDiakritiky = (s: string) =>
   s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
@@ -24,9 +26,47 @@ export default function NaseNebe() {
   const [otevrena, setOtevrena] = useState<number | null>(null);
   const [hlaska, setHlaska] = useState<string | null>(null);
   const [hotovo, setHotovo] = useState(false);
+  const [nacteno, setNacteno] = useState(false);
+  const [tajemstviOdhaleno, setTajemstviOdhaleno] = useState(false);
 
   const stars = sky.stars as [number, number, number][];
   const [vx, vy, vw, vh] = sky.viewBox;
+  const pocet = stars.length;
+
+  // Uložený postup se čte až po připojení v prohlížeči – kdyby se četl při
+  // prvním renderu, lišil by se výsledek na serveru a React by hlásil nesoulad.
+  useEffect(() => {
+    try {
+      const ulozeno = localStorage.getItem(ULOZISTE);
+      if (ulozeno) {
+        const s = JSON.parse(ulozeno);
+        const f: Faze = FAZE.includes(s.faze) ? s.faze : otazka.zapnuto ? "zamek" : "uvod";
+        if (f === "vyhra" || f === "galerie") {
+          setSpojeno(pocet);
+          setHotovo(true);
+        } else {
+          let n = Math.min(Math.max(Math.floor(Number(s.spojeno)) || 0, 0), pocet);
+          // obnovení při otevřené poslední kartě: srdce by nešlo dokončit,
+          // tak se poslední hvězda vrátí zpátky k rozsvícení
+          if (n === pocet) n = pocet - 1;
+          setSpojeno(n);
+        }
+        setFaze(f);
+      }
+    } catch {
+      // např. zakázané úložiště v anonymním okně – hra prostě začne od začátku
+    }
+    setNacteno(true);
+  }, [pocet]);
+
+  useEffect(() => {
+    if (!nacteno) return;
+    try {
+      localStorage.setItem(ULOZISTE, JSON.stringify({ faze, spojeno, hotovo }));
+    } catch {
+      // bez úložiště hra funguje dál, jen se postup nezapamatuje
+    }
+  }, [nacteno, faze, spojeno, hotovo]);
 
   const defs = `
     <radialGradient id="glow"><stop offset="0%" stop-color="#E8B4C1" stop-opacity="0.7"/>
@@ -63,12 +103,24 @@ export default function NaseNebe() {
     }
   };
 
+  const zahratZnovu = () => {
+    setSpojeno(0);
+    setHotovo(false);
+    setOtevrena(null);
+    setFaze("uvod");
+    window.scrollTo({ top: 0 });
+  };
+
   const vzpominka = otevrena !== null ? vzpominky[otevrena] : null;
 
   const body = stars.slice(0, spojeno).map(([x, y]) => `${x},${y}`).join(" ");
   const cely = stars.map(([x, y]) => `${x},${y}`).join(" ");
   const popisekY = Math.max(...stars.map((s) => s[1])) + 9;
   const popisekX = stars.reduce((a, s) => a + s[0], 0) / stars.length;
+
+  // Než se načte uložený postup, nekreslí se nic – jinak by na zlomek vteřiny
+  // probliklo zamčení a teprve pak by hra skočila tam, kde Lucinka skončila.
+  if (!nacteno) return <main className="stranka stred" />;
 
   // ---------------- zámek ----------------
   if (faze === "zamek") {
@@ -160,12 +212,28 @@ export default function NaseNebe() {
           ))}
         </div>
 
+        {tajemstviOdhaleno ? (
+          <div className="tajemstvi">
+            <p className="text bez-mezery">{tajnyVzkaz.text}</p>
+          </div>
+        ) : (
+          <button className="tlacitko jemne" onClick={() => setTajemstviOdhaleno(true)}>
+            {tajnyVzkaz.tlacitko}
+          </button>
+        )}
+
         <div className="karta vzkaz">
           <div className="srdicko">♥</div>
           <h2 className="titulek">{finale.nadpis}</h2>
+          <p className="cisla">{finale.cisla}</p>
           <p className="text">{finale.text}</p>
+          <p className="vyznani">{finale.vyznani}</p>
           <p className="podpis">{finale.podpis}</p>
         </div>
+
+        <button className="znovu" onClick={zahratZnovu}>
+          Spojit hvězdy znovu
+        </button>
       </main>
     );
   }

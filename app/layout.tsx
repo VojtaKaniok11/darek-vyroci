@@ -20,7 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      {/* Rozšíření prohlížeče (Grammarly a spol.) si do <body> přidávají vlastní
+          atributy dřív, než se React naváže – bez tohohle to hlásí jako nesoulad. */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

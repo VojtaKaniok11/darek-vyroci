@@ -28,6 +28,14 @@ Všechno, co budeš měnit, je v souboru **`data/vzpominky.ts`**:
 4. Objeví se výherní obrazovka **„Vyhrála jsi!“**.
 5. Tlačítkem se otevře galerie: celé srdce a všech 12 vzpomínek s fotkami pohromadě, dole závěrečný vzkaz.
 
+## Ukládání postupu
+
+Postup se průběžně ukládá do prohlížeče (`localStorage`, klíč `nase-nebe-postup`), takže obnovení stránky, zamčení telefonu ani zavření záložky hru nevrátí na začátek. Ukládá se jen fáze, počet spojených hvězd a to, jestli je srdce hotové – nic se nikam neodesílá.
+
+Úplně dole pod závěrečným vzkazem je nenápadné tlačítko **„Spojit hvězdy znovu“**, kterým se dá hra přehrát od začátku (třeba když ji bude chtít někomu ukázat). Přeskočí úvodní otázku a začne rovnou úvodní kartou.
+
+Postup je uložený v konkrétním prohlížeči, takže na jiném telefonu začne hra od začátku.
+
 ## Fotky
 
 Leží v `public/fotky/` a jsou zmenšené na 825 × 1100 px (dohromady 1,7 MB místo původních 11,5 MB, aby se hra načetla i na mobilních datech). Nezmenšené originály jsou ve složce `fotky-originaly/`, která se do gitu ani na Vercel nenahrává.

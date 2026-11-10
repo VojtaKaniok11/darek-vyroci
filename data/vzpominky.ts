@@ -111,9 +111,26 @@ export const vyhra = {
   cena: "Hlavní výhra: jeden Vojta · bez možnosti vrácení ♥",
 };
 
+// Skrytý vzkaz pod galerií – odhalí se tlačítkem, Lucinka v něm najde
+// tajný kód, který musí pošeptat Vojtovi, aby dostala dárek k výročí.
+export const tajnyVzkaz = {
+  tlacitko: "Myslela sis, že je to vše?",
+  text:
+    "Pokud tohle čteš, jsi tu správně. Najdi svého přítele a pošeptej mu tajný kód " +
+    "(čiči ráda čokoládu) – on už bude vědět, co s tebou dál.",
+};
+
 // Závěrečný vzkaz pod galerií všech vzpomínek.
 export const finale = {
   nadpis: "Krásné výročí, Lucinko",
-  text: "Čtyři roky, dvanáct hvězd a spousta dalších vzpomínek, které ještě nejsou na žádné fotce. Děkuju, že jsi se mnou.",
+  cisla:
+    "Jsou to přesně 4 roky, 48 měsíců, 208 týdnů, 1 461 dní, " +
+    "více než 2 miliony minut a přes 126 milionů sekund.",
+  text:
+    "A já za celou tu dobu nelituju ani jediné vteřiny strávené po tvém boku. " +
+    "Jsi mi obrovskou oporou a vždycky jsi byla, ať se dělo cokoliv. Pevně věřím, " +
+    "že tohle je pořád jenom začátek celého našeho příběhu a že nás spolu čeká " +
+    "ještě krásný a dlouhý kus života.",
+  vyznani: "Miluju tě!",
   podpis: "Tvůj Vojta",
 };
