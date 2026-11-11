@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import sky from "@/data/sky.json";
 import { vzpominky, otazka, vyhra, finale, tajnyVzkaz } from "@/data/vzpominky";
 
@@ -90,9 +90,45 @@ export default function NaseNebe() {
     }
   };
 
+  // Fotka se dřív začala stahovat až s otevřením karty, takže text naskočil
+  // hned a obrázek o chvilku později. Proto se fotky načítají a dekódují dopředu
+  // a karta se otevře až ve chvíli, kdy je její fotka připravená.
+  const pripravene = useRef(new Map<string, { img: HTMLImageElement; hotovo: Promise<void> }>());
+  const oteviram = useRef(false);
+
+  const pripravFoto = (foto?: string | null) => {
+    if (!foto) return Promise.resolve();
+    const src = `/fotky/${foto}`;
+    let z = pripravene.current.get(src);
+    if (!z) {
+      const img = new Image();
+      img.src = src;
+      z = { img, hotovo: img.decode().catch(() => {}) };
+      pripravene.current.set(src, z);
+    }
+    return z.hotovo;
+  };
+
+  useEffect(() => {
+    if (faze !== "hra") return;
+    vzpominky.forEach((v) => pripravFoto(v.foto));
+  }, [faze]);
+
+  const otevri = (i: number) => {
+    if (oteviram.current) return;
+    oteviram.current = true;
+    // pojistka: při hodně pomalém připojení se karta otevře nejpozději za 1,5 s
+    const limit = new Promise<void>((r) => setTimeout(r, 1500));
+    Promise.race([pripravFoto(vzpominky[i]?.foto), limit]).then(() => {
+      oteviram.current = false;
+      setOtevrena(i);
+    });
+  };
+
   const odemkniDalsi = () => {
+    if (oteviram.current) return;
     setSpojeno(spojeno + 1);
-    setOtevrena(spojeno);
+    otevri(spojeno);
   };
 
   const zavriVzpominku = () => {
@@ -295,7 +331,7 @@ export default function NaseNebe() {
               )}
               {stars.slice(0, spojeno).map(([x, y], i) => (
                 <circle key={i} cx={x} cy={y} r={1.4} fill="transparent" className="terc"
-                  onClick={() => setOtevrena(i)} />
+                  onClick={() => otevri(i)} />
               ))}
             </>
           )}
